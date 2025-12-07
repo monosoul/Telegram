@@ -17703,16 +17703,20 @@ public class MessagesController extends BaseController implements NotificationCe
                 }
                 dialogs_read_outbox_max.put(dialogId, Math.max(value, update.max_id));
             } else if (baseUpdate instanceof TLRPC.TL_updateDeleteMessages) {
-                TLRPC.TL_updateDeleteMessages update = (TLRPC.TL_updateDeleteMessages) baseUpdate;
-                if (deletedMessages == null) {
-                    deletedMessages = new LongSparseArray<>();
+                // MODIFIED: Ignore message deletion events to preserve chat history
+                // TLRPC.TL_updateDeleteMessages update = (TLRPC.TL_updateDeleteMessages) baseUpdate;
+                // if (deletedMessages == null) {
+                //     deletedMessages = new LongSparseArray<>();
+                // }
+                // ArrayList<Integer> arrayList = deletedMessages.get(0);
+                // if (arrayList == null) {
+                //     arrayList = new ArrayList<>();
+                //     deletedMessages.put(0, arrayList);
+                // }
+                // arrayList.addAll(update.messages);
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("Ignoring delete message event: " + baseUpdate);
                 }
-                ArrayList<Integer> arrayList = deletedMessages.get(0);
-                if (arrayList == null) {
-                    arrayList = new ArrayList<>();
-                    deletedMessages.put(0, arrayList);
-                }
-                arrayList.addAll(update.messages);
             } else if (baseUpdate instanceof TLRPC.TL_updateDeleteQuickReplyMessages) {
                 TLRPC.TL_updateDeleteQuickReplyMessages update = (TLRPC.TL_updateDeleteQuickReplyMessages) baseUpdate;
                 if (deletedQuickReplyMessages == null) {
@@ -18222,20 +18226,25 @@ public class MessagesController extends BaseController implements NotificationCe
                 }
                 dialogs_read_outbox_max.put(dialogId, Math.max(value, update.max_id));
             } else if (baseUpdate instanceof TLRPC.TL_updateDeleteChannelMessages) {
-                TLRPC.TL_updateDeleteChannelMessages update = (TLRPC.TL_updateDeleteChannelMessages) baseUpdate;
+                // MODIFIED: Ignore channel message deletion events to preserve chat history
+                // TLRPC.TL_updateDeleteChannelMessages update = (TLRPC.TL_updateDeleteChannelMessages) baseUpdate;
+                // if (BuildVars.LOGS_ENABLED) {
+                //     FileLog.d(baseUpdate + " channelId = " + update.channel_id);
+                // }
+                // if (deletedMessages == null) {
+                //     deletedMessages = new LongSparseArray<>();
+                // }
+                // long dialogId = -update.channel_id;
+                // ArrayList<Integer> arrayList = deletedMessages.get(dialogId);
+                // if (arrayList == null) {
+                //     arrayList = new ArrayList<>();
+                //     deletedMessages.put(dialogId, arrayList);
+                // }
+                // arrayList.addAll(update.messages);
                 if (BuildVars.LOGS_ENABLED) {
-                    FileLog.d(baseUpdate + " channelId = " + update.channel_id);
+                    TLRPC.TL_updateDeleteChannelMessages update = (TLRPC.TL_updateDeleteChannelMessages) baseUpdate;
+                    FileLog.d("Ignoring delete channel message event for channelId = " + update.channel_id);
                 }
-                if (deletedMessages == null) {
-                    deletedMessages = new LongSparseArray<>();
-                }
-                long dialogId = -update.channel_id;
-                ArrayList<Integer> arrayList = deletedMessages.get(dialogId);
-                if (arrayList == null) {
-                    arrayList = new ArrayList<>();
-                    deletedMessages.put(dialogId, arrayList);
-                }
-                arrayList.addAll(update.messages);
             } else if (baseUpdate instanceof TLRPC.TL_updateChannel) {
                 if (BuildVars.LOGS_ENABLED) {
                     TLRPC.TL_updateChannel update = (TLRPC.TL_updateChannel) baseUpdate;
